@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+	crossorigin="anonymous">
+		<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+	crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+		<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+		<script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script>
+
+		<style>
+			html, body {
+				height: 100%;
+			}
+
+			#categories {
+				overflow: auto;
+			}
+
+			.toggle {
+				#border-radius: 20px;
+				max-width: 5em;
+			}
+
+			.toggle label {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.btn-default {
+				background-color: #fff;
+				border-color: #ccc;
+			}
+
+			.card {
+				margin-bottom: 2%;
+			}
+
+			.category {
+				max-width: 100px;
+				float: left;
+				margin: 5px;
+			}
+
+			.category-text {
+				text-overflow: ellipsis;
+				text-align: center;
+			}
+
+			#quiz-body {
+				height: 80%;
+				overflow-y: auto;
+				display: flex;
+				align-items: center;
+			}
+
+			#next {
+				padding-top: 10px;
+				padding-bottom: 10px;
+			}
+
+			.question, .answer {
+				display: flex;
+				align-items: center;
+				flex-direction: column;
+				justify-content: center;
+				margin:	5%;
+				text-align: center;
+			}
+
+			.answer {
+				border: .5em solid lightgray;
+				border-radius: 2em;
+			}
+
+			.answer-hint {
+				border: .5em solid limegreen;
+				border-radius: 0em;
+			}
+
+			.question img, .answer img {
+				max-width: 50%;
+				max-height: 50%;
+			}
+
+			.divider {
+				margin-top: 2%;
+				margin-bottom: 2%;
+				border-bottom: 1px solid gray;
+			}
+
+			.quiz-item {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+
+			.answers {
+				display: flex;
+				align-items: stretch;
+			}
+
+			#response_video {
+				width: 40em;
+				height: 40em;
+				border-radius: 50%;
+			}
+
+			.correct {
+				background-color: #28a745;
+				border: .5em solid green;
+			}
+
+			.wrong {
+				background-color: #dc3545;
+				border: .5em solid #b93140;
+			}
+
+			#response .modal-content {
+				background: transparent;
+				border: none;
+				display: flex;
+				align-items: center;
+			}
+
+			#response_icon {
+				position: absolute;
+				margin-top: 15%;
+			}
+
+			#mode_container {
+				display: flex;
+				align-items: center;
+			}
+
+			#autoplay {
+				margin-left: .5em;
+			}
+
+			#logo {
+				width: 1em;
+				position: relative;
+				bottom: .25em;
+				right: -.1em;
+			}
+
+		</style>
+    <script>
+				var selections = {};
+				var question;
+				var iscorrect;
+				var invervalId;
+				var autoplay = false;
+				var mode = 'play';
+				var question_template =
+							'<div class="question row">\
+								<div class="col col-10">\
+									<% if(q_text) print("<h1 class=\'q_text\'>" + q_text + "</h1>") %>\
+									<% if(q_image) print("<div class=\'q_image\'><img src=\'" + q_image + "\'/></div>") %>\
+								</div>\
+							</div>';
+
+				var answer_template =
+							'<div id="a_<%= id %>" class="answer col col-md-4 col-lg-2 col-sm-8" onclick="checkAnswer(this)" data-id="<%= id %>">\
+								<% if(a_text) print("<h3 class=\'a_text\'>" + a_text + "</h3>") %>\
+								<% if(a_image) print("<div class=\'a_image\'><img src=\'" + a_image + "\'/></div>") %>\
+							</div>';
+
+				function toggleCategory(e){
+					var category = $(e).data('name');
+					if (_.has(selections, category)){
+					    delete selections[category];
+					    $(e).removeClass('bg-success');
+					    $(e).addClass('bg-light');
+					}
+					else {
+					    $(e).removeClass('bg-light');
+					    $(e).addClass('bg-success');
+					    selections[category] = 1;
+					}
+				}
+
+				function getQuizItem(){
+						var min_age = $('#min_age').val();
+						var max_age = $('#max_age').val();
+						var levels = [];
+						$("input:checkbox[class=level]:checked").each(function (){
+            	levels.push($(this).data('value'));
+        		});
+						var categories = [];
+						$.each(selections, function(key, value){
+						    categories.push(key);
+						});
+						var filters = {
+								min_age: min_age,
+								max_age: max_age,
+								levels: levels,
+								categories: categories
+						};
+
+						var url = window.location.origin + '/' + mode;
+						var query_params = _.reduce(filters, function(memo, val, key){
+						    memo.push(key + '=' + val);
+						    return memo;
+						}, [])
+						//url += '?' + query_params.join('&');
+						console.log(url);
+						$.get({url: url, data: filters, success: displayQuizItem})
+				}
+
+				function displayQuizItem(data){
+				    if (mode == 'learn') {
+				        question = data;
+								var learnTemplate =
+									'<div id="q_<%= id %>" class="quiz-item">' +
+										question_template +
+										'<div class="divider row"></div>' +
+										'<div class="answers row justify-content-center">' +
+										answer_template +
+									'</div>';
+
+				        var html = _.template(learnTemplate)(data);
+								$('#quiz-body').html(html);
+								$('#a_' + question.id).hide();
+						}
+				    else {
+				        var rand_indx = Math.floor(Math.random()*data.length);
+				        question = data[rand_indx];
+				        var play_template = '<div id="q_<%= id %>" class="quiz-item">' + question_template;
+				        var html = _.template(play_template)(question);
+				        html += '<div class="divider row"></div>';
+				        html += '<div class="answers row justify-content-center">';
+				        html = _.reduce(_.shuffle(data), function(memo, val, indx){
+				            return memo + _.template(answer_template)(val);
+								}, html);
+				        html += '</div></div>';
+				        $('#quiz-body').html(html);
+						}
+						$('#quiz-body').hide();
+				    $('#quiz-body').fadeIn(1000);
+
+						if (autoplay)
+								setTimeout(function(){
+									$('#a_' + question.id).slideDown(1000);
+								}, 2000);
+				}
+
+				function toggleMode(){
+				    var islearn = $('#mode').prop('checked');
+				    mode = islearn ? 'learn' : 'play';
+
+						$('#autoplay').toggle();
+						autoplay = false;
+						if(islearn){
+						    $('#autoplay').removeClass('fa-pause');
+						    $('#autoplay').addClass('fa-play');
+						}
+
+				    console.log(mode);
+				}
+
+				function showAnswer(){
+						if (mode == 'learn') {
+						    $('#a_' + question.id).slideDown(1000);
+            }
+            else {
+						    var el = $('#a_' + question.id)
+								setTimeout(function(){
+										el.addClass("answer-hint");
+										setTimeout(function(){
+												el.removeClass("answer-hint");
+										}, 400);
+								 },0)
+						}
+				}
+
+				function checkAnswer(e){
+				    if (mode == 'learn')
+				        return;
+
+				    is_correct = $(e).data('id') == question.id;
+				    var vid_prefix = is_correct ? 'yes' : 'no';
+						var img_src = 'videos/' + vid_prefix + '_' + Math.ceil(Math.random()*3) + '.mov';
+						$('#response_video').attr('src', img_src);
+						if (is_correct){
+						    $('#response_icon').removeClass('fa-times');
+						    $('#response_icon').addClass('fa-check');
+						    $('#response_video').removeClass('wrong');
+						    $('#response_video').addClass('correct');
+						}
+						else {
+						    $('#response_icon').removeClass('fa-check');
+						    $('#response_icon').addClass('fa-times');
+						    $('#response_video').removeClass('correct');
+						    $('#response_video').addClass('wrong');
+						}
+						$('#response').modal('show');
+				}
+
+				function hideResponse() {
+						$('#response').modal('hide');
+        }
+
+        function toggleAutoplay(){
+				    autoplay = !autoplay;
+				    $('#autoplay').toggleClass('fa-play');
+				    $('#autoplay').toggleClass('fa-pause');
+
+				    if (autoplay){
+				        intervalId = setInterval(function(){
+										getQuizItem();
+                }, 5000);
+						}
+						else
+								clearInterval(intervalId);
+
+				}
+
+				$(function(){
+						$.get('/api/categories/', function(data){
+						    var categories = _.chain(data)
+									.map(function(category){
+										var compiled = _.template(
+												'<div id="<%= name %>" class="card bg-light category" onclick="toggleCategory(this)" title="<%= name %>" data-name="<%= name %>">\
+													<img class="card-img-top" src="<%= image %>"\
+													<div class="card-body">\
+														<h5 class="card-title category-text"><%= name %></h5>\
+													</div>\
+												</div>'
+										);
+										return compiled(category)
+									})
+									.reduce(function(memo, card){
+											return memo + card;
+									}, '')
+									.value();
+						    $('#categories').html(categories);
+						})
+
+						//$('#settings').modal('show');
+						$('#settings').on('hidden.bs.modal', getQuizItem);
+						$('#response').on('hidden.bs.modal', function(){
+						    if (is_correct) {
+						        $('#next').click();
+								}
+						});
+
+						$('#mode').bootstrapToggle();
+				})
+
+    </script>
+</head>
+
+<body>
+		<header class="navbar navbar-light flex-md-row" style="background-color: #e3f2fd;">
+			<div id="mode_container">
+				<input id="mode" type="checkbox" onchange="toggleMode()" data-toggle="toggle" data-on="Learn" data-off="Play" data-onstyle="success" data-offstyle="primary">
+				<span id="autoplay" class="fas fa-play fa-2x" style="display: none" onclick="toggleAutoplay()"></span>
+			</div>
+			<span class="navbar-text h2"><img id="logo" src="favicon.ico">raśna</span>
+			<form class="form-inline">
+				<button class="fas fa-cog fa-2x" data-toggle="modal" data-target="#settings"></button>
+			</form>
+		</header>
+
+		<div class="container-fluid" id="quiz-body">
+		</div>
+
+		<footer class="navbar bg-dark justify-content-between fixed-bottom">
+			<button class="btn btn-warning rounded-circle" id="show-answer" onclick="showAnswer()">
+				<i class="far fa-lightbulb fa-2x"></i>
+			</button>
+			<button class="btn btn-success right rounded-circle" id="next" onclick="getQuizItem()">
+				<i class="fas fa-hand-point-right fa-2x"></i>
+			</button>
+		</footer>
+
+		<div class="modal fade" id="settings" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5>Settings</h5>
+					</div>
+					<div class="modal-body">
+
+						<!-- Select age range -->
+						<div class="card">
+							<div class="card-header">
+								Select age range
+							</div>
+							<div class="card-body">
+								<input type="number" min="0" max="100" id="min_age" value="0">
+								<span> To </span>
+								<input type="number" min="0" max="100" id="max_age" value="100">
+							</div>
+						</div>
+
+						<!-- Select difficulty -->
+						<div class="card">
+							<div class="card-header">
+								Select difficulty level
+							</div>
+							<div class="card-body">
+								<div class="btn-group" data-toggle="buttons">
+									<label class="btn btn-primary active">
+										<input class="level" type="checkbox" checked autocomplete="off" data-value="0"> Low
+									</label>
+									<label class="btn btn-warning">
+										<input class="level" type="checkbox" autocomplete="off" data-value="1"> Medium
+									</label>
+									<label class="btn btn-danger">
+										<input class="level" type="checkbox" autocomplete="off" data-value="2"> High
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-header">
+								Select categories
+							</div>
+							<div class="card-body" id="categories">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="response" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div id="response_icon" class="fas fa-4x"></div>
+					<video autoplay muted onended="hideResponse()" id="response_video" src="">
+					</video>
+				</div>
+			</div>
+		</div>
+
+</body>
+</html>

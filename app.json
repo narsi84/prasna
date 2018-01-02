@@ -1,0 +1,22 @@
+{
+  "name": "Prasna",
+  "description": "Quiz game for kids",
+  "image": "heroku/python",
+  "repository": "https://github.com/narsi84/prasna",
+  "keywords": ["python", "django" ],
+  "addons": [ "heroku-postgresql" ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "some random secret key",
+      "generator": "secret"
+    }
+  },
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "python manage.py collectstatic --noinput",
+        "test": "python manage.py test"
+      }
+    }
+  }
+}
