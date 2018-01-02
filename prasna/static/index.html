@@ -263,7 +263,7 @@
 						if (autoplay)
 								setTimeout(function(){
 									$('#a_' + question.id).slideDown(1000);
-								}, 2000);
+								}, 5000);
 				}
 
 				function toggleMode(){
@@ -330,7 +330,7 @@
 				    if (autoplay){
 				        intervalId = setInterval(function(){
 										getQuizItem();
-                }, 5000);
+                }, 10000);
 						}
 						else
 								clearInterval(intervalId);
