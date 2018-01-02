@@ -301,7 +301,7 @@
 
 				    is_correct = $(e).data('id') == question.id;
 				    var vid_prefix = is_correct ? 'yes' : 'no';
-						var img_src = 'videos/' + vid_prefix + '_' + Math.ceil(Math.random()*3) + '.mov';
+						var img_src = 'videos/' + vid_prefix + '_' + Math.ceil(Math.random()*3) + '.m4v';
 						$('#response_video').attr('src', img_src);
 						if (is_correct){
 						    $('#response_icon').removeClass('fa-times');
@@ -373,14 +373,14 @@
 </head>
 
 <body>
-		<header class="navbar navbar-light flex-md-row" style="background-color: #e3f2fd;">
+		<header class="navbar navbar-light flex-row" style="background-color: #e3f2fd;">
 			<div id="mode_container">
 				<input id="mode" type="checkbox" onchange="toggleMode()" data-toggle="toggle" data-on="Learn" data-off="Play" data-onstyle="success" data-offstyle="primary">
-				<span id="autoplay" class="fas fa-play fa-2x" style="display: none" onclick="toggleAutoplay()"></span>
+				<span id="autoplay" class="fas fa-play fa-3x" style="display: none" onclick="toggleAutoplay()"></span>
 			</div>
 			<span id="nav-heading" class="navbar-text h2"><img id="logo" src="favicon.ico">raśna</span>
 			<form class="form-inline">
-				<button class="fas fa-cog fa-2x" data-toggle="modal" data-target="#settings"></button>
+				<button class="fas fa-cog fa-3x" data-toggle="modal" data-target="#settings"></button>
 			</form>
 		</header>
 
@@ -389,10 +389,10 @@
 
 		<footer class="navbar bg-dark justify-content-between fixed-bottom">
 			<button class="btn btn-warning rounded-circle" id="show-answer" onclick="showAnswer()">
-				<i class="far fa-lightbulb fa-2x"></i>
+				<i class="far fa-lightbulb fa-3x"></i>
 			</button>
 			<button class="btn btn-success right rounded-circle" id="next" onclick="getQuizItem()">
-				<i class="fas fa-hand-point-right fa-2x"></i>
+				<i class="fas fa-hand-point-right fa-3x"></i>
 			</button>
 		</footer>
 
@@ -451,8 +451,8 @@
 		<div class="modal fade" id="response" tabindex="-1" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<div id="response_icon" class="fas fa-4x"></div>
-					<video autoplay muted onended="hideResponse()" id="response_video" src="">
+					<div id="response_icon" class="fas fa-3x"></div>
+					<video controls autoplay muted onended="hideResponse()" id="response_video" src="">
 					</video>
 				</div>
 			</div>
