@@ -74,9 +74,14 @@
 				align-items: center;
 				flex-direction: column;
 				justify-content: center;
-				margin:	5%;
+				margin:	2em;
 				text-align: center;
 			}
+
+			.question h1, .answer h3 {
+				white-space: pre;
+			}
+
 
 			.answer {
 				border: .5em solid lightgray;
@@ -89,8 +94,7 @@
 			}
 
 			.question img, .answer img {
-				max-width: 50%;
-				max-height: 50%;
+				max-height: 20em;
 			}
 
 			.divider {
@@ -156,6 +160,11 @@
 				right: -.1em;
 			}
 
+			#nav-heading {
+				padding-bottom: 0em;
+				margin-bottom: 0em;
+			}
+
 		</style>
     <script>
 				var selections = {};
@@ -167,14 +176,14 @@
 				var question_template =
 							'<div class="question row">\
 								<div class="col col-10">\
-									<% if(q_text) print("<h1 class=\'q_text\'>" + q_text + "</h1>") %>\
+									<% if(q_text) print("<h3 class=\'q_text\'>" + q_text + "</h3>") %>\
 									<% if(q_image) print("<div class=\'q_image\'><img src=\'" + q_image + "\'/></div>") %>\
 								</div>\
 							</div>';
 
 				var answer_template =
 							'<div id="a_<%= id %>" class="answer col col-md-4 col-lg-2 col-sm-8" onclick="checkAnswer(this)" data-id="<%= id %>">\
-								<% if(a_text) print("<h3 class=\'a_text\'>" + a_text + "</h3>") %>\
+								<% if(a_text) print("<h4 class=\'a_text\'>" + a_text + "</h4>") %>\
 								<% if(a_image) print("<div class=\'a_image\'><img src=\'" + a_image + "\'/></div>") %>\
 							</div>';
 
@@ -369,7 +378,7 @@
 				<input id="mode" type="checkbox" onchange="toggleMode()" data-toggle="toggle" data-on="Learn" data-off="Play" data-onstyle="success" data-offstyle="primary">
 				<span id="autoplay" class="fas fa-play fa-2x" style="display: none" onclick="toggleAutoplay()"></span>
 			</div>
-			<span class="navbar-text h2"><img id="logo" src="favicon.ico">raśna</span>
+			<span id="nav-heading" class="navbar-text h2"><img id="logo" src="favicon.ico">raśna</span>
 			<form class="form-inline">
 				<button class="fas fa-cog fa-2x" data-toggle="modal" data-target="#settings"></button>
 			</form>
