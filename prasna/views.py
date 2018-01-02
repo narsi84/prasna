@@ -27,7 +27,7 @@ class QuestionViewSet(APIView):
         filters = {}
         print(request.query_params)
         if 'category' in request.query_params:
-            filters['category__in'] = request.query_params['category']
+            filters['category__in'] = request.query_params['categories']
 
         min_age = int(request.query_params.get('min_age', 0))
         max_age = int(request.query_params.get('max_age', 100))

@@ -224,9 +224,9 @@
 						    memo.push(key + '=' + val);
 						    return memo;
 						}, [])
-						//url += '?' + query_params.join('&');
+						url += '?' + query_params.join('&');
 						console.log(url);
-						$.get({url: url, data: filters, success: displayQuizItem})
+						$.get({url: url, success: displayQuizItem})
 				}
 
 				function displayQuizItem(data){
