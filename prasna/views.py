@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from prasna.filters import QuizItemFilter
-from prasna.models import QuizItem, Category
-from prasna.serializers import CategorySerializer, QuizItemSerializer
+from prasna.models import QuizItem, Category, Media
+from prasna.serializers import CategorySerializer, QuizItemSerializer, MediaSerializer
 
 
 class CategoryViewSet(ModelViewSet):
@@ -20,6 +20,11 @@ class QuizItemViewSet(ModelViewSet):
     queryset = QuizItem.objects.select_related('category').all()
     serializer_class = QuizItemSerializer
     filter_class = QuizItemFilter
+
+
+class MediaViewSet(ModelViewSet):
+    queryset = Media.objects.all()
+    serializer_class = MediaSerializer
 
 
 class QuestionViewSet(APIView):
