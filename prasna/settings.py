@@ -121,7 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = 'http://192.168.1.68:9000/'
+STATIC_URL = '/static'
 STATICFILES_LOCATION = 'static'
 
 # # Extra places for collectstatic to find static files.
@@ -147,8 +147,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 AWS_STORAGE_BUCKET_NAME = 'prasna'
 AWS_S3_REGION_NAME = 'us-west-1'  # e.g. us-east-2
-AWS_ACCESS_KEY_ID = 'AKIAJJI7MJVVYVTMVXZQ'
-AWS_SECRET_ACCESS_KEY = 'A4cNw5eyUgm4nhKif9yKdPf2lrCs6KHeKckb0K4g'
+AWS_ACCESS_KEY_ID = os.getenv('aws_access_key')
+AWS_SECRET_ACCESS_KEY = os.getenv('aws_secret_key')
 
 # Tell django-storages the domain to use to refer to static files.
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME

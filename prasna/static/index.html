@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Quiz</title>
+	<title>Praśna</title>
+
+    <link rel="shortcut icon" href="/static/favicon.ico" />
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
 	crossorigin="anonymous">
@@ -22,6 +24,29 @@
     <style>
         html, body {
             height: 100%;
+            font-size: 100%;
+        }
+
+        @media screen and (min-width: 800px) {
+            html, body {
+                font-size: 150%;
+            }
+
+            .answer {
+                margin: .5em !important;
+            }
+        }
+
+        @media screen and (min-width: 1000px) and (orientation: landscape){
+            html {
+                width: 50%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        header, footer {
+            height: 4em;
         }
 
         #categories {
@@ -60,8 +85,8 @@
         }
 
         #quiz-body {
-            //height: 80%;
-            //overflow-y: auto;
+            height: calc(100% - 8em);
+            overflow-y: auto;
             display: flex;
             align-items: center;
         }
@@ -74,35 +99,53 @@
         .question, .answer {
             display: flex;
             align-items: center;
-            flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-evenly;
             text-align: center;
+            flex-direction: column;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .question h3 h4, .answer h3 h4 {
             white-space: pre;
         }
 
+        .q_image {
+            height: 70%;
+        }
+
+        .a_image {
+            height: 6em;
+        }
+
+        .q_image img, .a_image img {
+            height: 100%;
+            border-radius: 2em;
+        }
+
+        .q_audio {
+            height: 7em;
+        }
 
         .answer {
-            border: .5em solid lightgray;
+            border: 2px solid lightskyblue;
             border-radius: 2em;
-            margin: .2em;
+            margin: 1em;
+            max-height: 8em;
+        }
+
+        .answer:hover {
+            background-color: lightgreen;
         }
 
         .answer-hint {
-            border: .5em solid limegreen;
+            border: .25em solid green;
             border-radius: 0em;
-        }
-
-        .question img, .answer img {
-            max-width: 75%;
-            max-height: 50%;
-            border-radius: 3em;
         }
 
         .divider {
             margin-top: 2%;
+            height: 2%;
             margin-bottom: 2%;
             border-bottom: 1px solid gray;
         }
@@ -117,12 +160,15 @@
 
         .answers {
             display: flex;
-            align-items: stretch;
+        }
+
+        .question, .answers {
+            height: 45%;
         }
 
         #response_video {
-            width: 40em;
-            height: 40em;
+            width: 25em;
+            height: 25em;
             border-radius: 50%;
         }
 
@@ -143,9 +189,16 @@
             align-items: center;
         }
 
+        .modal-dialog {
+            display: flex;
+            height: 90%;
+            justify-content: center;
+            align-items: center;
+        }
+
         #response_icon {
             position: absolute;
-            margin-top: 15%;
+            margin-top: 10%;
         }
 
         #mode_container {
@@ -167,6 +220,8 @@
         #nav-heading {
             padding-bottom: 0em;
             margin-bottom: 0em;
+            position: fixed;
+            left: calc(50% - 1.5em);
         }
 
     </style>
@@ -178,31 +233,30 @@
         var autoplay = false;
         var mode = 'play';
         var question_template =
-                    '<div class="question row">\
-                        <div class="col col-10">\
-                            <% if(q_text) print("<h3 class=\'q_text\'>" + q_text + "</h3>") %>\
-                            <% if(!q_video && q_image) print(\
-                                "<div class=\'q_image\'>\
-                                    <img src=\'" + q_image.file + "\'/>\
-                                 </div>") %>\
-                            <% if(!q_video && q_audio) print(\
-                                "<div class=\'q_audio\'>\
-                                    <audio autoplay controls controlsList=\'nodownload\'>\
-                                       <source src=\'" + q_audio.file + "\' type=\'audio/mpeg\'>\
-                                    </audio>\
-                                 </div>") %>\
-                            <% if(q_video) print(\
-                                "<div class=\'q_video\'>\
-                                    <video width=\'300\' height=\'200\' autoplay controls playsinline \
-                                    controlsList=\'nodownload\'>\
-                                        <source src=\'" + q_video.file + "\' type=\'video/mp4\'>\
-                                    </video>\
-                                </div>") %>\
-                        </div>\
+                    '<div class="question">\
+                        <% if(q_text) print("<h3 class=\'q_text\'>" + q_text + "</h3>") %>\
+                        <% if(!q_video && q_image) print(\
+                            "<div class=\'q_image\'>\
+                                <img src=\'" + q_image.file + "\'/>\
+                             </div>") %>\
+                        <% if(!q_video && q_audio) print(\
+                            "<div class=\'q_audio\'>\
+                                <audio autoplay controls playsinline controlsList=\'nodownload\'>\
+                                   <source src=\'" + q_audio.file + "\' type=\'audio/mpeg\'>\
+                                </audio>\
+                             </div>") %>\
+                        <% if(q_video) print(\
+                            "<div class=\'q_video\'>\
+                                <video width=\'100%\' height=\'100%\' autoplay \
+                                playsinline controlsList=\'nodownload\'>\
+                                    <source src=\'" + q_video.file + "\' type=\'video/mp4\'>\
+                                </video>\
+                            </div>") %>\
                     </div>';
 
         var answer_template =
-                    '<div id="a_<%= id %>" class="answer col col-md-4 col-lg-2 col-sm-8" onclick="checkAnswer(this)" data-id="<%= id %>">\
+                    '<div id="a_<%= id %>" class="answer col col-lg-2 col-sm-11 col-md-5" \
+                    onclick="checkAnswer(this)" data-id="<%= id %>">\
                         <% if(a_text) print("<h4 class=\'a_text\'>" + a_text + "</h4>") %>\
                         <% if(a_image) print("<div class=\'a_image\'><img src=\'" + a_image.file + \
                         "\'/></div>") %>\
@@ -322,7 +376,7 @@
 
             is_correct = $(e).data('id') == question.id;
             var vid_prefix = is_correct ? 'yes' : 'no';
-                var img_src = 'videos/' + vid_prefix + '_' + Math.ceil(Math.random()*3) + '.m4v';
+                var img_src = 'https://prasna.s3.amazonaws.com/media/responses/' + vid_prefix + '_' + Math.ceil(Math.random()*3) + '.m4v';
                 $('#response_video').attr('src', img_src);
                 if (is_correct){
                     $('#response_icon').removeClass('fa-times');
@@ -383,30 +437,40 @@
             $('#response').on('hidden.bs.modal', function(){
                 if (is_correct) {
                     $('#next').click();
-                    }
+                }
             });
 
             $('#mode').bootstrapToggle();
+
+            var searchParams = new URLSearchParams(window.location.search);
+            if (searchParams.has('id')){
+                mode = 'learn';
+                var url = '/learn?' + searchParams.toString();
+                $.get({url: url, success: function(data){
+                    displayQuizItem(data);
+                    showAnswer();
+                }})
+            }
         });
 	</script>
 </head>
 
 <body>
     <header class="navbar navbar-light flex-row" style="background-color: #e3f2fd;">
-        <div id="mode_container">
+        <div id="mode_container" onclick="function setmode(){}">
             <input id="mode" type="checkbox" onchange="toggleMode()" data-toggle="toggle" data-on="Learn" data-off="Play" data-onstyle="success" data-offstyle="primary">
-            <span id="autoplay" class="fas fa-play fa-3x" style="display: none" onclick="toggleAutoplay()"></span>
+            <span id="autoplay" class="fas fa-play" style="display: none" onclick="toggleAutoplay()"></span>
         </div>
         <span id="nav-heading" class="navbar-text h2"><img id="logo" src="favicon.ico">raśna</span>
-        <form class="form-inline">
-            <button class="fas fa-cog fa-3x" data-toggle="modal" data-target="#settings"></button>
-        </form>
+        <div data-toggle="modal" data-target="#settings" onclick="function settings(){}">
+            <button class="fas fa-cog fa-2x"></button>
+        </div>
     </header>
 
     <div class="container-fluid" id="quiz-body">
     </div>
 
-    <footer class="navbar bg-dark justify-content-between fixed-bottom">
+    <footer class="navbar justify-content-between fixed-bottom">
         <button class="btn btn-warning rounded-circle" id="show-answer" onclick="showAnswer()">
             <i class="far fa-lightbulb fa-3x"></i>
         </button>

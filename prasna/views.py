@@ -41,6 +41,9 @@ class QuestionViewSet(APIView):
         if 'levels' in request.query_params:
             filters['difficulty__in'] = [int(x) for x in request.query_params['levels'].split(',')]
 
+        if 'id' in request.query_params:
+            filters = {'pk': request.query_params['id']}
+
         q_items = QuizItem.objects.filter(**filters)
 
         ids = q_items.values_list('id', flat=True)

@@ -21,7 +21,7 @@ class Media(TimeStampedModel):
         self.get_media_tag(self)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - {self.type}'
 
     @classmethod
     def get_media_tag(cls, field):
@@ -94,10 +94,14 @@ class QuizItem(TimeStampedModel):
     def a_image_tag(self):
         return Media.get_media_tag(self.a_image)
 
+    def test_url(self):
+        return mark_safe(f'<a href="/static/index.html?id={self.id}" target="_blank">Test</a>')
+
     q_image_tag.short_description = 'Q Image'
     q_video_tag.short_description = 'Q Video'
     q_audio_tag.short_description = 'Q Audio'
     a_image_tag.short_description = 'A Image'
+    test_url.short_description = 'Test'
 
     class Meta:
         verbose_name_plural = 'Quiz items'

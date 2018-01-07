@@ -7,7 +7,7 @@ from prasna.models import QuizItem, Category, Media
 
 
 class QuizItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'category', 'difficulty', 'age', 'q_text', 'q_image_tag',
+    list_display = ('id', 'test_url', 'category', 'difficulty', 'age', 'q_text', 'q_image_tag',
                     'q_audio_tag', 'q_video_tag', 'a_text', 'a_image_tag')
     readonly_fields = ('q_image_tag', 'a_image_tag', 'q_audio_tag', 'q_video_tag')
     search_fields = ['a_text', 'q_text']
