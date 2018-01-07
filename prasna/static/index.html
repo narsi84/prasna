@@ -126,7 +126,7 @@
             max-height: 8em;
         }
 
-        .answer:hover {
+        .answer-selected {
             background-color: lightgreen;
         }
 
@@ -370,6 +370,12 @@
         function checkAnswer(e){
             if (mode == 'learn')
                 return;
+
+            $('.answer').each(function(idx, elem){
+                $(elem).removeClass('answer-selected');
+            })
+
+            $(e).addClass('answer-selected');
 
             is_correct = $(e).data('id') == question.id;
             var vid_prefix = is_correct ? 'yes' : 'no';
