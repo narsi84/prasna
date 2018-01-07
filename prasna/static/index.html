@@ -42,6 +42,7 @@
         }
 
         #categories {
+            height: 20em;
             overflow: auto;
         }
 
@@ -66,9 +67,8 @@
         }
 
         .category {
-            max-width: 100px;
-            float: left;
             margin: 5px;
+            max-height: 45%;
         }
 
         .category-text {
@@ -98,7 +98,7 @@
             text-overflow: ellipsis;
         }
 
-        .question h3 h4, .answer h3 h4 {
+        .question h3, .question h4, .answer h3, .answer h4 {
             white-space: pre;
         }
 
@@ -214,6 +214,11 @@
             margin-bottom: 0em;
             position: fixed;
             left: calc(50% - 1.5em);
+        }
+
+        #settings .modal-dialog {
+            width: 90%;
+            max-width: 100% !important;
         }
 
     </style>
@@ -408,7 +413,8 @@
                 var categories = _.chain(data)
                     .map(function(category){
                         var compiled = _.template(
-                                '<div id="<%= name %>" class="card bg-light category" onclick="toggleCategory(this)" title="<%= name %>" data-name="<%= name %>">\
+                                '<div id="<%= name %>" class="card bg-light category col-5" \
+                                onclick="toggleCategory(this)" title="<%= name %>" data-name="<%= name %>">\
                                     <img class="card-img-top" src="<%= image %>"\
                                     <div class="card-body">\
                                         <h5 class="card-title category-text"><%= name %></h5>\
@@ -472,41 +478,36 @@
     </footer>
 
     <div class="modal" id="settings" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5>Settings</h5>
-                </div>
                 <div class="modal-body">
-
                     <!-- Select age range -->
                     <div class="card">
                         <div class="card-header">
-                            Select age range
+                            Select age range & difficulty
                         </div>
-                        <div class="card-body">
-                            <input type="number" min="0" max="100" id="min_age" value="0">
-                            <span> To </span>
-                            <input type="number" min="0" max="100" id="max_age" value="100">
-                        </div>
-                    </div>
-
-                    <!-- Select difficulty -->
-                    <div class="card">
-                        <div class="card-header">
-                            Select difficulty level
-                        </div>
-                        <div class="card-body">
-                            <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-primary active">
-                                    <input class="level" type="checkbox" checked autocomplete="off" data-value="0"> Low
-                                </label>
-                                <label class="btn btn-warning">
-                                    <input class="level" type="checkbox" autocomplete="off" data-value="1"> Medium
-                                </label>
-                                <label class="btn btn-danger">
-                                    <input class="level" type="checkbox" autocomplete="off" data-value="2"> High
-                                </label>
+                        <div class="card-body row">
+                            <div class="col col-6 text-center">
+                                <label>Age</label>
+                                <div class="text-center">
+                                    <input type="number" min="0" max="100" id="min_age" value="0">
+                                    <span> To </span>
+                                    <input type="number" min="0" max="100" id="max_age" value="100">
+                                </div>
+                            </div>
+                            <div class="col col-6 text-center">
+                                <label>Difficulty</label>
+                                <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-primary active">
+                                        <input class="level" type="checkbox" checked autocomplete="off" data-value="0"> Low
+                                    </label>
+                                    <label class="btn btn-warning">
+                                        <input class="level" type="checkbox" autocomplete="off" data-value="1"> Medium
+                                    </label>
+                                    <label class="btn btn-danger">
+                                        <input class="level" type="checkbox" autocomplete="off" data-value="2"> High
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -515,7 +516,7 @@
                         <div class="card-header">
                             Select categories
                         </div>
-                        <div class="card-body" id="categories">
+                        <div class="card-body row" id="categories">
                         </div>
                     </div>
                 </div>
