@@ -58,10 +58,9 @@ class QuestionViewSet(APIView):
             # Find 3 other items in the same category as `q_item`
             filters['category'] = q_item.category
 
-            print(filters)
-            print(q_item.tags)
-
-            q_items = QuizItem.objects.filter(**filters).exclude(tags__overlap=q_item.tags)
+            q_items = QuizItem.objects.filter(**filters).exclude(
+                tags__overlap=q_item.tags, pk=q_item.pk
+            )
             ids = q_items.values_list('id', flat=True)
 
             rand_ids = random.sample(list(ids), min(3, len(ids)))
