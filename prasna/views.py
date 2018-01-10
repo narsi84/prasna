@@ -1,5 +1,6 @@
 import random
 
+from django.db.models import Q
 from psycopg2._range import NumericRange
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -59,7 +60,7 @@ class QuestionViewSet(APIView):
             filters['category'] = q_item.category
 
             q_items = QuizItem.objects.filter(**filters).exclude(
-                tags__overlap=q_item.tags, pk=q_item.pk
+                Q(tags__overlap=q_item.tags) |  Q(pk=q_item.pk)
             )
             ids = q_items.values_list('id', flat=True)
 
