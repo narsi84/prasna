@@ -8,10 +8,10 @@ from prasna.models import QuizItem, Category, Media
 
 class QuizItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'test_url', 'category', 'difficulty', 'age', 'q_text', 'q_image_tag',
-                    'q_audio_tag', 'q_video_tag', 'a_text', 'a_image_tag')
+                    'q_audio_tag', 'q_video_tag', 'a_text', 'a_image_tag', 'tags')
     readonly_fields = ('q_image_tag', 'a_image_tag', 'q_audio_tag', 'q_video_tag')
-    search_fields = ['a_text', 'q_text']
-    list_editable = ('category', 'difficulty', 'age', 'q_text', 'a_text')
+    search_fields = ['a_text', 'q_text', 'tags']
+    list_editable = ('category', 'difficulty', 'age', 'q_text', 'a_text', 'tags')
     autocomplete_fields = ['q_image', 'q_audio', 'q_video', 'a_image']
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows': 2, 'cols': 40})},

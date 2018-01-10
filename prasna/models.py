@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import IntegerRangeField
+from django.contrib.postgres.fields import IntegerRangeField, ArrayField
 from django.contrib.postgres.validators import RangeMinValueValidator
 from django.db import models
 
@@ -78,6 +78,8 @@ class QuizItem(TimeStampedModel):
     a_text = models.TextField(null=False)
     a_image = models.ForeignKey(Media, null=True, blank=True, on_delete=SET_NULL,
                                 related_name='a_images')
+
+    tags = ArrayField(models.CharField(max_length=20), size=10, default=list, blank=True)
 
     def __str__(self):
         return f'{self.q_text} => {self.a_text}'

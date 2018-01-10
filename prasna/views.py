@@ -45,15 +45,29 @@ class QuestionViewSet(APIView):
             filters = {'pk': request.query_params['id']}
 
         q_items = QuizItem.objects.filter(**filters)
-
         ids = q_items.values_list('id', flat=True)
+        rand_id = ids[random.randint(0, len(ids) - 1)]
+        q_item = q_items.get(pk=rand_id)
 
         if mode == 'learn':
-            rand_id = ids[random.randint(0, len(ids) - 1)]
-            q_item = q_items.get(pk=rand_id)
             return Response(QuizItemSerializer(q_item).data)
         else:
-            rand_ids = random.sample(list(ids), min(4, len(ids)))
+
+            filters.pop('category__name__in', None)
+
+            # Find 3 other items in the same category as `q_item`
+            filters['category'] = q_item.category
+
+            print(filters)
+            print(q_item.tags)
+
+            q_items = QuizItem.objects.filter(**filters).exclude(tags__overlap=q_item.tags)
+            ids = q_items.values_list('id', flat=True)
+
+            rand_ids = random.sample(list(ids), min(3, len(ids)))
+            rand_qitems = [
+                QuizItemSerializer(q).data for q in q_items.filter(pk__in=rand_ids).all()
+            ]
             return Response(
-                [QuizItemSerializer(q_item).data for q_item in q_items.filter(pk__in=rand_ids)]
+                [QuizItemSerializer(q_item).data] + rand_qitems
             )
