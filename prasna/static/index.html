@@ -227,6 +227,10 @@
             max-width: 100% !important;
         }
 
+        .q_video video {
+            width: 80%;
+        }
+
     </style>
     <script>
         var selections = {};
@@ -251,8 +255,7 @@
                              </div>") %>\
                         <% if(q_video) print(\
                             "<div class=\'q_video\'>\
-                                <video width=\'100%\' height=\'100%\' autoplay controls \
-                                playsinline controlsList=\'nodownload\'>\
+                                <video autoplay controls playsinline controlsList=\'nodownload\'>\
                                     <source src=\'" + q_video.file + "\' type=\'video/mp4\'>\
                                 </video>\
                             </div>") %>\
