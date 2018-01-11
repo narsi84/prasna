@@ -44,10 +44,10 @@ class QuestionViewSet(APIView):
         if 'id' in request.query_params:
             filters = {'pk': request.query_params['id']}
 
-        history = [int(i) for i in request.query_params['history'].split(',') if i]
+        history = [int(i) for i in request.query_params.get('history', '').split(',') if i]
         q_items = QuizItem.objects.exclude(id__in=history).filter(**filters)
 
-        if not q_items.exists():
+        if not q_items.exists() and history:
             # If no items exist, recycle oldest item
             history = history[1:]
             q_items = QuizItem.objects.exclude(id__in=history).filter(**filters)
