@@ -31,7 +31,6 @@ class MediaViewSet(ModelViewSet):
 class QuestionViewSet(APIView):
     def get(self, request, mode):
         filters = {}
-        print(request.query_params)
         if request.query_params.get('categories', ''):
             filters['category__name__in'] = request.query_params['categories'].split(',')
 
@@ -45,7 +44,14 @@ class QuestionViewSet(APIView):
         if 'id' in request.query_params:
             filters = {'pk': request.query_params['id']}
 
-        q_items = QuizItem.objects.filter(**filters)
+        history = [int(i) for i in request.query_params['history'].split(',') if i]
+        q_items = QuizItem.objects.exclude(id__in=history).filter(**filters)
+
+        if not q_items.exists():
+            # If no items exist, recycle oldest item
+            history = history[1:]
+            q_items = QuizItem.objects.exclude(id__in=history).filter(**filters)
+
         ids = q_items.values_list('id', flat=True)
         rand_id = ids[random.randint(0, len(ids) - 1)]
         q_item = q_items.get(pk=rand_id)
@@ -60,7 +66,7 @@ class QuestionViewSet(APIView):
             filters['category'] = q_item.category
 
             q_items = QuizItem.objects.filter(**filters).exclude(
-                Q(tags__overlap=q_item.tags) |  Q(pk=q_item.pk)
+                Q(tags__overlap=q_item.tags) | Q(pk=q_item.pk)
             )
             ids = q_items.values_list('id', flat=True)
 
